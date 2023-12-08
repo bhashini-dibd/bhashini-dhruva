@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class _ULCATaskType(str, Enum):
     ASR = "asr"
+    OCR =  "ocr"
     TRANSLATION = "translation"
     TTS = "tts"
     TRANSLITERATION = "transliteration"

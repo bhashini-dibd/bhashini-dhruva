@@ -24,6 +24,7 @@ from .ulca_ner_inference_request import (
 from .ulca_pipeline_inference_request import ULCAPipelineInferenceRequest
 from .ulca_s2s_inference_request import ULCAS2SInferenceRequest
 from .ulca_translation_inference_request import ULCATranslationInferenceRequest
+from .ulca_ocr_inference_request import ULCAOcrInferenceRequest
 from .ulca_transliteration_inference_request import ULCATransliterationInferenceRequest
 from .ulca_tts_inference_request import (
     ULCATtsInferenceRequest,
@@ -34,6 +35,7 @@ from .ulca_vad_inference_request import ULCAVadInferenceRequest
 ULCAInferenceRequest = Union[
     ULCAGenericInferenceRequest,
     ULCAAsrInferenceRequest,
+    ULCAOcrInferenceRequest,
     ULCATranslationInferenceRequest,
     ULCATransliterationInferenceRequest,
     ULCATtsInferenceRequest,

@@ -339,7 +339,7 @@ class InferenceService:
                 encoded_result = np.array([])
             output_text = encoded_result[0].decode('UTF-8')
 
-            results.append({"source": output_text, "target": output_text})
+            results.append({"source": output_text})
         return ULCAOcrInferenceResponse(output=results)
 
     async def run_translation_triton_inference(

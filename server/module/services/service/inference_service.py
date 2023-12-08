@@ -300,7 +300,7 @@ class InferenceService:
             user_id,
             request_body.config.serviceId,
             "ocr",
-            request_body.config.language.sourceLanguage,
+            request_body.config.languages[0].sourceLanguage,
             None,
         ).inc()
 

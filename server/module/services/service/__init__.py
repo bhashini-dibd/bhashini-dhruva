@@ -1,4 +1,5 @@
 from .admin_service import AdminService
+from .image_service import ImageService
 from .audio_service import AudioService
 from .details_service import DetailsService
 from .feedback_service import FeedbackService

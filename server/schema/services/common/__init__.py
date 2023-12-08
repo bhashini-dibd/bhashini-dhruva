@@ -1,9 +1,12 @@
 from .audio_format import AudioFormat
+from .image_format import ImageFormat
 from .dhruva_model import Model
 from .dhruva_service import Service
 from .gender import Gender
 from .lang_to_script import LANG_CODE_TO_SCRIPT_CODE
 from .ulca_audio import _ULCAAudio
+from .ulca_image import _ULCAImage
+from .ulca_base_image_config import _ULCABaseImageConfig
 from .ulca_base_audio_config import _ULCABaseAudioConfig
 from .ulca_base_inference_request import _ULCABaseInferenceRequest
 from .ulca_base_inference_request_config import _ULCABaseInferenceRequestConfig
@@ -17,3 +20,4 @@ from .ulca_text_pair import _ULCATextPair
 from .ulca_text_pair_multisuggestion import _ULCATextPairMultisuggestion
 from .ulca_translation_inference_config import _ULCATranslationInferenceConfig
 from .ulca_transliteration_inference_config import _ULCATransliterationInferenceConfig
+from .ulca_ocr_inference_config import _ULCAOcrInferenceConfig

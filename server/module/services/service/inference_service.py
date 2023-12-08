@@ -328,7 +328,7 @@ class InferenceService:
                 None).time():
                 response = self.inference_gateway.send_triton_request(
                         url=service.endpoint,
-                        model_name="python_tesseract",
+                        model_name="ocr",
                         input_list=inputs,
                         output_list=outputs,
                         headers=headers,

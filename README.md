@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 
 <div align="center">
-  <h3 align="center">Dhruva</h3>
+  <h1 align="center">Dhruva</h1>
 </div>
 
 <!-- TABLE OF CONTENTS -->
@@ -38,6 +38,8 @@
 ## About The Project
 
 Dhruva is a full-fledged platform for serving AI models at scale.
+<img width="1272" alt="image" src="https://github.com/bhashini-dibd/bhashini-dhruva/assets/1707796/168141b3-6a96-4b41-90f1-a669f3cd0b06">
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

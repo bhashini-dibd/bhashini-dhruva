@@ -488,7 +488,11 @@ class InferenceService:
                 
                 str_data = json.dumps(encoded_result[0].decode('utf-8'))
                 json_data = json.loads(str_data)
-                return json_data
+                json_data = json.loads(json_data)
+                results.append(json_data["output"][0])
+        
+        return ULCATxtLangDetectionInferenceResponse(output=results)
+
         #         if encoded_result is None:
         #             encoded_result = np.array([np.array([])])
         #         print(f"encoded result : {encoded_result}")
@@ -501,7 +505,6 @@ class InferenceService:
 
         #     results.append(result)
 
-        # return ULCATxtLangDetectionInferenceResponse(output=results)
 
 
     async def run_transliteration_triton_inference(

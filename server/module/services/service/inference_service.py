@@ -485,19 +485,23 @@ class InferenceService:
                     )
                 print(response)
                 encoded_result = response.as_numpy("OUTPUT_TEXT")
-                if encoded_result is None:
-                    encoded_result = np.array([np.array([])])
-                print(f"encoded result : {encoded_result}")
-                data_str = encoded_result[0].decode('utf-8')
-                json_data = json.loads(data_str)
                 
-                result = json_data
-            else:
-                result = {'output': [{'source': input_string, 'langPrediction': [{'langCode': '', 'langScore': 0.0}]}]}
+                str_data = json.dumps(encoded_result[0].decode('utf-8'))
+                json_data = json.loads(str_data)
+                return json_data
+        #         if encoded_result is None:
+        #             encoded_result = np.array([np.array([])])
+        #         print(f"encoded result : {encoded_result}")
+        #         data_str = encoded_result[0].decode('utf-8')
+        #         json_data = json.loads(data_str)
+                
+        #         result = json_data
+        #     else:
+        #         result = {'output': [{'source': input_string, 'langPrediction': [{'langCode': '', 'langScore': 0.0}]}]}
 
-            results.append(result)
+        #     results.append(result)
 
-        return ULCATxtLangDetectionInferenceResponse(output=results)
+        # return ULCATxtLangDetectionInferenceResponse(output=results)
 
 
     async def run_transliteration_triton_inference(

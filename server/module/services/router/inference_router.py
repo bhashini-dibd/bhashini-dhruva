@@ -165,7 +165,7 @@ async def _run_inference_ocr(
         request, request_state.state.api_key_name, request_state.state.user_id
     )
 
-@router.post("/txtlangdetection")
+@router.post("/txtlangdetection", response_model=ULCATxtLangDetectionInferenceResponse)
 async def _run_inference_txtlangdetection(
     request: ULCATxtLangDetectionInferenceRequest,
     request_state: Request,

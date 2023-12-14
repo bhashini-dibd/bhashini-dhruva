@@ -55,6 +55,10 @@ class InferenceGateway:
                 outputs=output_list,
                 headers=headers,
             )
+            print('*********************')
+            print(type(response))
+            print(response)
+            print('*********************')
             response = response.get_result(block=True, timeout=20)
 
         except:

@@ -460,6 +460,7 @@ class InferenceService:
         for input in request_body.input:
             input_string = input.source.replace("\n", " ").strip()
             if input_string:
+                print(f"input string : {input_string}")
                 (
                     inputs,
                     outputs,
@@ -484,19 +485,17 @@ class InferenceService:
                     )
 
                 encoded_result = response.as_numpy("OUTPUT_TEXT")
-
-                # lang_codes = [Hi,Bh]
-                # lang_scores = [85,10]
-                # lang_scripts = [Deva,Deva]
-
                 if encoded_result is None:
                     encoded_result = np.array([np.array([])])
-
-                result = [r.decode("utf-8") for r in encoded_result.tolist()[0]]
+                print(f"encoded result : {encoded_result}")
+                data_str = encoded_result[0].decode('utf-8')
+                json_data = json.loads(data_str)
+                
+                result = json_data
             else:
-                result = [input_string]
+                result = {'output': [{'source': input_string, 'langPrediction': [{'langCode': '', 'langScore': 0.0}]}]}
 
-            results.append({"source": input_string, "target": result})
+            results.append(result)
 
         return ULCATxtLangDetectionInferenceResponse(output=results)
 

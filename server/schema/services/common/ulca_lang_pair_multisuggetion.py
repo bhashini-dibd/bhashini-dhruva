@@ -9,4 +9,5 @@ class _ULCALangPrediction(BaseModel):
     langScore :Optional[float]
 
 class _ULCALangPairMultisuggestion(_ULCAText):
+    source : str
     langPrediction: List[_ULCALangPrediction]

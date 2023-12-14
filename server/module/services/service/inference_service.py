@@ -465,7 +465,7 @@ class InferenceService:
                     inputs,
                     outputs,
                 ) = self.triton_utils_service.get_txtlangdetection_io_for_triton(
-                    input_string ,is_word_level, top_k
+                    input_string
                 )
                
                 with INFERENCE_REQUEST_DURATION_SECONDS.labels(

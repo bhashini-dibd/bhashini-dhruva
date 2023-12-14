@@ -9,8 +9,10 @@ import tritonclient.http as httpclient
 
 
 class TritonUtilsService:
-    def get_string_tensor(self, string_values, tensor_name: str):
+    def get_string_tensor(self, string_values, tensor_name: str,reshape=False):
         string_obj = np.array(string_values, dtype="object")
+        if reshape == True:
+            string_obj = np.reshape(string_obj,(-1,1))
         input_obj = http_client.InferInput(
             tensor_name, string_obj.shape, np_to_triton_dtype(string_obj.dtype)
         )
@@ -67,7 +69,7 @@ class TritonUtilsService:
         input_string: str
     ):
         inputs = [
-            self.get_string_tensor([input_string], "INPUT_TEXT")
+            self.get_string_tensor([input_string], "INPUT_TEXT",True)
         ]
         outputs = [http_client.InferRequestedOutput("OUTPUT_TEXT")]
         return inputs, outputs

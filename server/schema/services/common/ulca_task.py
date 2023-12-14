@@ -12,6 +12,7 @@ class _ULCATaskType(str, Enum):
     NER = "ner"
     STS = "sts"  # TODO: Remove
     VAD = "vad"
+    TXTLANGDETECTION = "txtlangdetection"
 
 
 # TODO: Depreciate soon

@@ -468,7 +468,6 @@ class InferenceService:
                 ) = self.triton_utils_service.get_txtlangdetection_io_for_triton(
                     input_string
                 )
-                inputs = [np.array.reshape(inputs[0], (-1, 1))]
                 with INFERENCE_REQUEST_DURATION_SECONDS.labels(
                     api_key_name,
                     user_id,
@@ -484,7 +483,7 @@ class InferenceService:
                         output_list=outputs,
                         headers=headers,
                     )
-
+                print(response)
                 encoded_result = response.as_numpy("OUTPUT_TEXT")
                 if encoded_result is None:
                     encoded_result = np.array([np.array([])])

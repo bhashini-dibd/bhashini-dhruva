@@ -456,7 +456,9 @@ class InferenceService:
         #         status_code=status.HTTP_400_BAD_REQUEST,
         #         message="Topk is not valid for sentence level",
         #     )
-
+        return_json_data = {
+            "output":[]
+        }
         for input in request_body.input:
             input_string = input.source.replace("\n", " ").strip()
             if input_string:
@@ -488,7 +490,9 @@ class InferenceService:
                 
                 str_data = json.dumps(encoded_result[0].decode('utf-8'))
                 json_data = json.loads(str_data)
-                return json_data
+                json_data = json.loads(json_data)
+                return_json_data["output"].append(json_data["output"][0])
+        return return_json_data
         #         if encoded_result is None:
         #             encoded_result = np.array([np.array([])])
         #         print(f"encoded result : {encoded_result}")

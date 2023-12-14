@@ -38,6 +38,7 @@ from schema.services.request import (
     ULCATransliterationInferenceRequest,
     ULCATtsInferenceRequest,
     ULCAVadInferenceRequest,
+    ULCATxtLangDetectionInferenceRequest,
 )
 from schema.services.request.ulca_asr_inference_request import ULCATextFormat
 from schema.services.request.ulca_vad_inference_request import (
@@ -53,6 +54,7 @@ from schema.services.response import (
     ULCATransliterationInferenceResponse,
     ULCATtsInferenceResponse,
     ULCAVadInferenceResponse,
+    ULCATxtLangDetectionInferenceResponse,
 )
 from schema.services.response.ulca_vad_inference_response import _ULCATimestamps
 from scipy.io import wavfile
@@ -170,6 +172,11 @@ class InferenceService:
             case _ULCATaskType.NER:
                 request_obj = ULCANerInferenceRequest(**request_body)
                 return await self.run_ner_triton_inference(
+                    request_obj, api_key_name, user_id
+                )
+            case _ULCATaskType.TXTLANGDETECTION:
+                request_obj = ULCATxtLangDetectionInferenceRequest(**request_body)
+                return await self.run_txtlangdetection_triton_inference(
                     request_obj, api_key_name, user_id
                 )
             case _:
@@ -418,6 +425,80 @@ class InferenceService:
             results.append({"source": source_text, "target": result[0].decode("utf-8")})
 
         return ULCATranslationInferenceResponse(output=results)
+    
+    async def run_txtlangdetection_triton_inference(
+        self,
+        request_body: ULCATxtLangDetectionInferenceRequest,
+        api_key_name: str,
+        user_id: str,
+    ) -> ULCATxtLangDetectionInferenceResponse:
+        INFERENCE_REQUEST_COUNT.labels(
+            api_key_name,
+            user_id,
+            request_body.config.serviceId,
+            "txt-lang-detection",
+            None,
+            None,
+        ).inc()
+
+        serviceId = request_body.config.serviceId
+
+        service: Service = validate_service_id(serviceId, self.service_repository)  # type: ignore
+        headers = {"Authorization": "Bearer " + service.api_key}
+
+        results = []
+        
+        is_word_level = not request_body.config.isSentence
+        top_k = request_body.config.numSuggestions
+
+        # if top_k and not is_word_level:
+        #     raise ClientError(
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         message="Topk is not valid for sentence level",
+        #     )
+
+        for input in request_body.input:
+            input_string = input.source.replace("\n", " ").strip()
+            if input_string:
+                print(f"input string : {input_string}")
+                (
+                    inputs,
+                    outputs,
+                ) = self.triton_utils_service.get_txtlangdetection_io_for_triton(
+                    input_string ,is_word_level, top_k
+                )
+               
+                with INFERENCE_REQUEST_DURATION_SECONDS.labels(
+                    api_key_name,
+                    user_id,
+                    request_body.config.serviceId,
+                    "txt-lang-detection",
+                    None,
+                    None,
+                ).time():
+                    response = self.inference_gateway.send_triton_request(
+                        url=service.endpoint,
+                        model_name="txt-lang-detection",
+                        input_list=inputs,
+                        output_list=outputs,
+                        headers=headers,
+                    )
+
+                encoded_result = response.as_numpy("OUTPUT_TEXT")
+                if encoded_result is None:
+                    encoded_result = np.array([np.array([])])
+                print(f"encoded result : {encoded_result}")
+                data_str = encoded_result[0].decode('utf-8')
+                json_data = json.loads(data_str)
+                
+                result = json_data
+            else:
+                result = {'output': [{'source': input_string, 'langPrediction': [{'langCode': '', 'langScore': 0.0}]}]}
+
+            results.append(result)
+
+        return ULCATxtLangDetectionInferenceResponse(output=results)
+
 
     async def run_transliteration_triton_inference(
         self,

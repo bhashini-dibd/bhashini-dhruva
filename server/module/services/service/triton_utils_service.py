@@ -62,7 +62,19 @@ class TritonUtilsService:
         outputs = [httpclient.InferRequestedOutput("OUTPUT_TEXT")]
         
         return input_tensors , outputs
-
+    def get_txtlangdetection_io_for_triton(
+        self,
+        input_string: str,
+        is_word_level: bool,
+        top_k: int,
+    ):
+        inputs = [
+            self.get_string_tensor([input_string], "INPUT_TEXT"),
+            self.get_bool_tensor([is_word_level], "IS_WORD_LEVEL"),
+            self.get_uint8_tensor([top_k], "TOP_K"),
+        ]
+        outputs = [http_client.InferRequestedOutput("OUTPUT_TEXT")]
+        return inputs, outputs
 
     def get_transliteration_io_for_triton(
         self,

@@ -461,13 +461,14 @@ class InferenceService:
             input_string = input.source.replace("\n", " ").strip()
             if input_string:
                 print(f"input string : {input_string}")
+
                 (
                     inputs,
                     outputs,
                 ) = self.triton_utils_service.get_txtlangdetection_io_for_triton(
                     input_string
                 )
-               
+                inputs = [np.array.reshape(inputs[0], (-1, 1))]
                 with INFERENCE_REQUEST_DURATION_SECONDS.labels(
                     api_key_name,
                     user_id,

@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class _ULCALangPrediction(BaseModel):
     langCode : str
-    ScriptCode :Optional[str]
+    scriptCode :Optional[str]
     langScore :Optional[float]
 
 class _ULCALangPairMultisuggestion(_ULCAText):

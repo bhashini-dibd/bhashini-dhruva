@@ -790,6 +790,10 @@ class InferenceService:
                 if next_task_type not in {_ULCATaskType.TTS}:
                     is_pipeline_valid = False
                     break
+            elif current_task_type == _ULCATaskType.OCR:
+                if next_task_type not in {_ULCATaskType.TRANSLATION,_ULCATaskType.TTS,_ULCATaskType.TRANSLITERATION}:
+                    is_pipeline_valid = False
+                    break
             elif current_task_type == _ULCATaskType.TRANSLITERATION:
                 if next_task_type not in {_ULCATaskType.TRANSLATION, _ULCATaskType.TTS}:
                     is_pipeline_valid = False
@@ -891,6 +895,13 @@ class InferenceService:
                 del previous_output_json["output"]
 
                 if pipeline_task.taskType == _ULCATaskType.TRANSLATION:
+                    # The output (target) of translation should be input (source) to next
+                    for i in range(len(previous_output_json["input"])):
+                        previous_output_json["input"][i][
+                            "source"
+                        ] = previous_output_json["input"][i]["target"]
+                        del previous_output_json["input"][i]["target"]
+                if pipeline_task.taskType == _ULCATaskType.OCR:
                     # The output (target) of translation should be input (source) to next
                     for i in range(len(previous_output_json["input"])):
                         previous_output_json["input"][i][
@@ -1038,6 +1049,9 @@ class InferenceService:
                     serviceId = "ai4bharat/conformer-multilingual-indo_aryan-gpu--t4"
             case _ULCATaskType.TRANSLATION:
                 serviceId = "ai4bharat/indictrans-v2-all-gpu--t4"
+            case _ULCATaskType.OCR:
+                # if config["language"]["sourceLanguage"] in {"en","hi","ta","te","ml","kn","mr"."gu","bn","or"}
+                serviceId = "bhashini/tesseract-ocr-printed-all"
             case _ULCATaskType.TTS:
                 if config["language"]["sourceLanguage"] in {"kn", "ml", "ta", "te"}:
                     serviceId = "ai4bharat/indic-tts-coqui-dravidian-gpu--t4"

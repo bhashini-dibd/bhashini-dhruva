@@ -7,4 +7,6 @@ from .ulca_language import _ULCALanguage
 
 
 class _ULCABaseImageConfig(BaseModel):
-    languages: List[_ULCALanguage]
+    isMultilingual:Optional[bool] =  False
+    languages: Optional[List[_ULCALanguage]]
+    language : Optional[_ULCALanguage]

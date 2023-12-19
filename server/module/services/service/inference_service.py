@@ -302,36 +302,49 @@ class InferenceService:
     async def run_ocr_triton_inference(
         self, request_body: ULCAOcrInferenceRequest, api_key_name: str, user_id: str
     ) -> ULCAOcrInferenceResponse:
+        if not request_body.config.isMultilingual :
+            try:
+                lang_or_langs = [request_body.config.language.sourceLanguage]
+            except Exception:
+                raise BaseError(Errors.DHRUVA102.value, traceback.format_exc())
+        else:
+            lang_or_langs =[]
+            try:
+                for lang in request_body.config.languages:    
+                        lang_or_langs.append(lang.sourceLanguage)
+            except Exception:
+                raise BaseError(Errors.DHRUVA102.value, traceback.format_exc())
+
         INFERENCE_REQUEST_COUNT.labels(
             api_key_name,
             user_id,
             request_body.config.serviceId,
             "ocr",
-            request_body.config.languages[0].sourceLanguage,
+            lang_or_langs[0], # TODO need modification in dashbord for multilingual models
             None,
         ).inc()
 
         serviceId = request_body.config.serviceId
+        
 
         service: Service = validate_service_id(serviceId, self.service_repository)  # type: ignore
         headers = {"Authorization": "Bearer " + service.api_key}
 
-        language = request_body.config.languages[0].sourceLanguage
         results = []
         for input in request_body.image:
 
             file_bytes = self.__get_image_bytes(input)
             print(f"type of file byte {type(file_bytes)}")
-            print(f"type of file byte{type(language)}")
+            print(f"type of file byte{type(lang_or_langs)}")
 
-            inputs, outputs = self.triton_utils_service.get_ocr_io_for_triton(file_bytes, language)
+            inputs, outputs = self.triton_utils_service.get_ocr_io_for_triton(file_bytes, lang_or_langs)
             
             with INFERENCE_REQUEST_DURATION_SECONDS.labels(
                 api_key_name,
                 user_id,
                 request_body.config.serviceId,
                 "ocr",
-                request_body.config.languages[0].sourceLanguage,
+                lang_or_langs[0], # TODO need modification in dashbord for multilingual models
                 None).time():
                 response = self.inference_gateway.send_triton_request(
                         url=service.endpoint,
@@ -1049,8 +1062,11 @@ class InferenceService:
                     serviceId = "ai4bharat/conformer-multilingual-indo_aryan-gpu--t4"
             case _ULCATaskType.TRANSLATION:
                 serviceId = "ai4bharat/indictrans-v2-all-gpu--t4"
+            case _ULCATaskType.TXTLANGDETECTION:
+                serviceId = "bhashini/anuvaad/line-lang-detection-all"
             case _ULCATaskType.OCR:
                 # if config["language"]["sourceLanguage"] in {"en","hi","ta","te","ml","kn","mr"."gu","bn","or"}
+                # as of now there is no generic model for OCR
                 serviceId = "bhashini/tesseract-ocr-printed-all"
             case _ULCATaskType.TTS:
                 if config["language"]["sourceLanguage"] in {"kn", "ml", "ta", "te"}:

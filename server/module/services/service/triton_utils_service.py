@@ -46,11 +46,12 @@ class TritonUtilsService:
     
 
 
-    def get_ocr_io_for_triton(self, image, language: str):
-
+    def get_ocr_io_for_triton(self, image, language_list:List):
+        
         # image = np.asarray(Image.open(requests.get(image, stream=True).raw))
-        input_language_id = np.array([language], dtype="object")
-
+        
+        input_language_id = np.array(language_list, dtype="object")
+    
         print( f"Image shape inside get ocr io : {image.shape}")
         print(f"language id  shape inside get ocr io : {input_language_id.shape}")
         # Set Inputs

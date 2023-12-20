@@ -358,6 +358,7 @@ class InferenceService:
             if encoded_result is None:
                 encoded_result = np.array([])
             output_text = encoded_result[0].decode('UTF-8')
+            output_text = output_text.strip('\n\f')
 
             results.append({"source": output_text, "target": ""})
         return ULCAOcrInferenceResponse(output=results)

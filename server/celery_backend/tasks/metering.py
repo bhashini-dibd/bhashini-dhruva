@@ -25,6 +25,9 @@ from .constants import (
     TTS_GPU_MULTIPLIER,
     TTS_RAM_MULTIPLIER,
     TTS_TOKEN_CALCULATION_MULTIPLIER,
+    OCR_GPU_MULTIPLIER,
+    OCR_CPU_MULTIPLIER,
+    OCR_RAM_MULTIPLIER,
 )
 from .database import AppDatabase
 from .metering_database import ApiKey, engine
@@ -38,6 +41,12 @@ def get_audio_length(audio) -> float:
     return data.shape[0] / sampling_rate
 
 
+def get_image_length(image) -> int:
+
+    high,width ,channels = image.shape
+    total_pixels = high*width
+    return total_pixels
+
 def calculate_asr_usage(data) -> int:
     total_usage = 0
     for d in data:
@@ -48,7 +57,15 @@ def calculate_asr_usage(data) -> int:
         )
 
     return total_usage
-
+def calculate_ocr_usage(data) -> int:
+    total_usage = 0
+    for d in data:
+        image = d["imageContent"]
+        total_pixels = get_image_length(image)
+        total_usage += math.ceil(
+            total_pixels * OCR_GPU_MULTIPLIER * OCR_CPU_MULTIPLIER * OCR_RAM_MULTIPLIER
+        )
+    return total_usage
 
 def calculate_translation_usage(data) -> int:
     # ** Note: **
@@ -145,6 +162,8 @@ def meter_usage(
     inference_units = 0
     if usage_type == "asr":
         inference_units = calculate_asr_usage(input_data)
+    elif usage_type == "ocr":
+        inference_units = calculate_ocr_usage(input_data)
     elif usage_type == "translation" or usage_type == "transliteration":
         inference_units = calculate_translation_usage(input_data)
     elif usage_type == "tts":

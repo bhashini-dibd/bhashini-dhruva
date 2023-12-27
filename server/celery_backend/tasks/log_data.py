@@ -8,11 +8,15 @@ from datetime import datetime
 from urllib.request import urlopen
 
 from ulid import ULID
+import cv2
+import numpy as np
 
 from ..celery_app import app
 from . import constants
 from .database import LogDatastore
 from .metering import meter_usage
+
+
 
 log_store = LogDatastore()
 
@@ -32,6 +36,17 @@ def log_to_storage(
         inp = (
             [o["audioContent"] for o in input_data.get("audio")]
             if input_data and input_data.get("audio")
+            else None
+        )
+        op = (
+            [o["source"] for o in output_data.get("output")]
+            if output_data and output_data.get("output")
+            else None
+        )
+    elif output_data.get("taskType") == "ocr":
+        inp = (
+            [o["imageContent"] for o in input_data.get("image")]
+            if input_data and input_data.get("image")
             else None
         )
         op = (
@@ -67,9 +82,6 @@ def log_to_storage(
 
     log_document = {
         "client_ip": client_ip,
-        "source_language": input_data.get("config", {})
-        .get("language", {})
-        .get("sourceLanguage"),
         "target_language": input_data.get("config", {})
         .get("language", {})
         .get("targetLanguage"),
@@ -80,6 +92,13 @@ def log_to_storage(
         "service_id": service_id,
         "timestamp": datetime.now().strftime("%d-%m-%Y,%H:%M:%S"),
     }
+
+    if "languages" in input_data.get("config", {}):
+        log_document["source_languages"]= [lang.get("sourceLanguage") for lang in  input_data["config"]["languages"]]
+    else:
+        log_document["source_language"]= input_data.get("config", {}).get("language", {}).get("sourceLanguage")
+
+
 
     # Create a file in the local data directory to upload and download
     local_file_name = str(ULID.from_timestamp(time.time())) + ".json"
@@ -135,7 +154,11 @@ def log_data(
                     urlopen(ele["audioUri"]).read()
                 ).decode("utf-8")
         data_usage = req_body["audio"]
-
+    elif usage_type == 'ocr':
+        for i, ele in enumerate(req_body["image"]):
+            if ele["imageUri"]:
+                req_body["image"][i]["imageContent"] = cv2.imdecode(np.frombuffer(urlopen(ele["imageUri"]).read(), np.uint8), -1)
+        data_usage = req_body["image"]
     else:
         raise ValueError(f"Invalid task type: {usage_type}")
 

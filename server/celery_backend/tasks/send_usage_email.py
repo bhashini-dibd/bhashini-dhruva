@@ -26,6 +26,8 @@ def get_usage_val_and_unit(task_type: str, val: float):
         return (val / 1000, "Input Kilo-Characters")
     elif task_type == "asr":
         return (val / 3600, "Input Audio Time (In Hours)")
+    elif task_type == "ocr":
+        return (val , "Input Image in pixels")
     else:
         return (val, "")
 

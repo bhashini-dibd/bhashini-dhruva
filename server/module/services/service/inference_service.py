@@ -391,8 +391,8 @@ class InferenceService:
         print(f"Request Body Profanity Filter :: {request_body.config.profanityFilter}")
 
         profanityFilter = True
-        if profanityFilter in request_body.config and isinstance(profanityFilter, bool):
-            profanityFilter = request_body.config.profanityFilter
+        if request_body.config.profanityFilter is not None and request_body.config.profanityFilter == False:
+            profanityFilter = False
 
         print(f"After Selection Profanity Filter :: {profanityFilter}")
 

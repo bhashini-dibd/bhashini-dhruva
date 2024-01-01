@@ -282,7 +282,12 @@ class InferenceService:
                 transcript_source_lines: List[Tuple[str, Dict[str, float]]] = []
                 for transcript_line in transcript_lines:
                     js = json.loads(transcript_line[0])  # type: ignore
-                    transcript_source_lines.append((js["source"], transcript_line[1]))
+                    print(f"TRANSCRIPT_LINE :: {transcript_line}")
+                    if ProfanityFilter == True:
+                        output_text = profanityFilterObject.censor_words(request_body.config.language.sourceLanguage,js["source"])
+                    else:
+                        output_text = js["source"]
+                    transcript_source_lines.append((output_text, transcript_line[1]))
                     n_best_tokens.extend(js["nBestTokens"])
 
             if request_body.config.postProcessors:
@@ -297,7 +302,7 @@ class InferenceService:
             )
 
             if ProfanityFilter == True:
-                transcript = profanityFilterObject.censor_words(transcript)
+                transcript = profanityFilterObject.censor_words(transcript.strip())
 
             res.output.append(
                 _ULCATextNBest(

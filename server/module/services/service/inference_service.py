@@ -461,7 +461,7 @@ class InferenceService:
 
         if profanityFilter == True:
             results = [
-                {"source": each_result["source"], "target": profanityFilterObject.censor_words(each_result["target"])}
+                {"source": each_result["source"], "target": profanityFilterObject.censor_words(source_lang,each_result["target"])}
                 for each_result in results
             ]
 

@@ -198,6 +198,10 @@ class InferenceService:
 
         serviceId = request_body.config.serviceId
 
+        profanityFilter = True
+        if request_body.config.profanityFilter is not None and request_body.config.profanityFilter == False:
+            profanityFilter = False
+
         service: Service = validate_service_id(serviceId, self.service_repository)  # type: ignore
         headers = {"Authorization": "Bearer " + service.api_key}
 
@@ -291,6 +295,9 @@ class InferenceService:
             transcript = self.__create_asr_response_format(
                 transcript_source_lines, request_body.config.transcriptionFormat.value
             )
+
+            if ProfanityFilter == True:
+                transcript = profanityFilterObject.censor_words(transcript)
 
             res.output.append(
                 _ULCATextNBest(
@@ -387,14 +394,10 @@ class InferenceService:
 
         source_lang = request_body.config.language.sourceLanguage
         target_lang = request_body.config.language.targetLanguage
-        
-        print(f"Request Body Profanity Filter :: {request_body.config.profanityFilter}")
 
         profanityFilter = True
         if request_body.config.profanityFilter is not None and request_body.config.profanityFilter == False:
             profanityFilter = False
-
-        print(f"After Selection Profanity Filter :: {profanityFilter}")
 
         # TODO: Make Triton itself accept script-code separately
         if (
@@ -647,10 +650,17 @@ class InferenceService:
             else request_body.config.audioFormat.value
         )
 
+        profanityFilter = True
+        if request_body.config.profanityFilter is not None and request_body.config.profanityFilter == False:
+            profanityFilter = False
+
         results = []
 
         for input in request_body.input:
             input_string = self.__process_tts_input(input.source)
+            
+            if profanityFilter == True:
+                input_string = profanityFilterObject.censor_words(ip_language,input_string)
 
             if input_string:
                 inputs, outputs = self.triton_utils_service.get_tts_io_for_triton(

@@ -68,7 +68,9 @@ from .image_service import ImageService
 from .post_processor_service import PostProcessorService
 from .subtitle_service import SubtitleService
 from .triton_utils_service import TritonUtilsService
+from ..utilities.profanity.profanity_filter import ProfanityFilter
 
+profanityFilterObject = ProfanityFilter()
 
 def populate_service_cache(serviceId: str, service_repository: ServiceRepository):
     service = service_repository.get_by_service_id(serviceId)
@@ -385,7 +387,11 @@ class InferenceService:
 
         source_lang = request_body.config.language.sourceLanguage
         target_lang = request_body.config.language.targetLanguage
-
+        
+        profanityFilter = True
+        if profanityFilter in request_body.config:
+            profanityFilter = request_body.config.profanityFilter
+        
         # TODO: Make Triton itself accept script-code separately
         if (
             request_body.config.language.sourceScriptCode
@@ -407,6 +413,19 @@ class InferenceService:
             input.source.replace("\n", " ").strip() if input.source else " "
             for input in request_body.input
         ]
+
+        print(f"TEST62 ******************* PROFANITY FILTER :: {profanityFilter}")
+
+        print(f"TEST62 ******************* INPUT TEXTS BEFORE PROFANITY CHECK :: {input_texts}")
+
+        if profanityFilter == True:
+
+            input_texts = [
+                profanityFilterObject.censor_words(source_lang,input_text)
+                for input_text in input_texts
+            ]
+
+        print(f"TEST62 ******************* INPUT TEXTS AFTER PROFANITY CHECK :: {input_texts}")            
 
         inputs, outputs = self.triton_utils_service.get_translation_io_for_triton(
             input_texts, source_lang, target_lang
@@ -438,6 +457,16 @@ class InferenceService:
         for source_text, result in zip(input_texts, output_batch):
             results.append({"source": source_text, "target": result[0].decode("utf-8")})
 
+        print(f"TEST62 ******************* OUTPUT TEXTS BEFORE PROFANITY CHECK :: {results}")
+
+        if profanityFilter == True:
+            results = [
+                {"source": each_result["source"], "target": profanityFilterObject.censor_words(each_result["target"])}
+                for each_result in results
+            ]
+
+        print(f"TEST62 ******************* OUTPUT TEXTS AFTER PROFANITY CHECK :: {results}")
+
         return ULCATranslationInferenceResponse(output=results)
     
     async def run_txtlangdetection_triton_inference(
@@ -446,7 +475,7 @@ class InferenceService:
         api_key_name: str,
         user_id: str,
     ) -> ULCATxtLangDetectionInferenceResponse:
-        INFERENCE_REQUEST_COUNT.labels(
+        INFERENCE_REQUEST_COUNT.lrun_txtlangdetection_triton_inferencebels(
             api_key_name,
             user_id,
             request_body.config.serviceId,

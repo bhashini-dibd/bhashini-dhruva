@@ -5,7 +5,7 @@ profanity.load_censor_words()
 
 class ProfanityFilter():
     def english_censor(self, text):
-        return profanity.censor(text)   
+        return profanity.censor(text,"")   
     
     def hindi_censor(self, text):
         return text

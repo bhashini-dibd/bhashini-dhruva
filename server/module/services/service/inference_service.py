@@ -268,7 +268,6 @@ class InferenceService:
                 if encoded_result is None:
                     encoded_result = np.array([])
 
-                print(f"ENCODED RESULT :: {encoded_result.tolist()}")
                 transcript_lines.extend(
                     [
                         (profanityFilterObject.censor_words(request_body.config.language.sourceLanguage,result.decode("utf-8")), speech_timestamps[i + idx])
@@ -476,7 +475,7 @@ class InferenceService:
         api_key_name: str,
         user_id: str,
     ) -> ULCATxtLangDetectionInferenceResponse:
-        INFERENCE_REQUEST_COUNT.lrun_txtlangdetection_triton_inferencebels(
+        INFERENCE_REQUEST_COUNT.labels(
             api_key_name,
             user_id,
             request_body.config.serviceId,

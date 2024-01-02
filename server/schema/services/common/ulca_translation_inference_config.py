@@ -4,3 +4,4 @@ from .ulca_language_pair import _ULCALanguagePair
 
 class _ULCATranslationInferenceConfig(_ULCABaseInferenceRequestConfig):
     language: _ULCALanguagePair
+    profanityFilter: bool = True

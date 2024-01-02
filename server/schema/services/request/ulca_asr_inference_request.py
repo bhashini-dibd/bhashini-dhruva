@@ -28,6 +28,7 @@ class _ULCAAsrInferenceRequestConfig(
     postProcessors: Optional[List[str]]
     transcriptionFormat: ULCATranscriptionFormat = ULCATranscriptionFormat()
     bestTokenCount: int = 0
+    profanityFilter: bool = True
 
 
 class ULCAAsrInferenceRequest(_ULCABaseInferenceRequest):

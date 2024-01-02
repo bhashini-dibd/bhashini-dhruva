@@ -57,3 +57,4 @@ FastAPI-SQLAlchemy==0.2.1
 azure-storage-queue==12.7.3
 opencv-python==4.8.1.78
 PILLOW==10.1.0
+better-profanity==0.7.0

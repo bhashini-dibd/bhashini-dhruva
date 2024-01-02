@@ -68,7 +68,9 @@ from .image_service import ImageService
 from .post_processor_service import PostProcessorService
 from .subtitle_service import SubtitleService
 from .triton_utils_service import TritonUtilsService
+from ..utilities.profanity.profanity_filter import ProfanityFilter
 
+profanityFilterObject = ProfanityFilter()
 
 def populate_service_cache(serviceId: str, service_repository: ServiceRepository):
     service = service_repository.get_by_service_id(serviceId)
@@ -196,6 +198,10 @@ class InferenceService:
 
         serviceId = request_body.config.serviceId
 
+        profanityFilter = True
+        if request_body.config.profanityFilter is not None and request_body.config.profanityFilter == False:
+            profanityFilter = False
+
         service: Service = validate_service_id(serviceId, self.service_repository)  # type: ignore
         headers = {"Authorization": "Bearer " + service.api_key}
 
@@ -264,6 +270,9 @@ class InferenceService:
 
                 transcript_lines.extend(
                     [
+                        (profanityFilterObject.censor_words(request_body.config.language.sourceLanguage,result.decode("utf-8")), speech_timestamps[i + idx])
+                        if profanityFilter == True
+                        else
                         (result.decode("utf-8"), speech_timestamps[i + idx])
                         for idx, result in enumerate(encoded_result.tolist())
                     ]
@@ -289,6 +298,9 @@ class InferenceService:
             transcript = self.__create_asr_response_format(
                 transcript_source_lines, request_body.config.transcriptionFormat.value
             )
+
+            if ProfanityFilter == True:
+                transcript = profanityFilterObject.censor_words(transcript.strip())
 
             res.output.append(
                 _ULCATextNBest(
@@ -386,6 +398,10 @@ class InferenceService:
         source_lang = request_body.config.language.sourceLanguage
         target_lang = request_body.config.language.targetLanguage
 
+        profanityFilter = True
+        if request_body.config.profanityFilter is not None and request_body.config.profanityFilter == False:
+            profanityFilter = False
+
         # TODO: Make Triton itself accept script-code separately
         if (
             request_body.config.language.sourceScriptCode
@@ -407,6 +423,13 @@ class InferenceService:
             input.source.replace("\n", " ").strip() if input.source else " "
             for input in request_body.input
         ]
+
+        if profanityFilter == True:
+
+            input_texts = [
+                profanityFilterObject.censor_words(source_lang,input_text)
+                for input_text in input_texts
+            ]
 
         inputs, outputs = self.triton_utils_service.get_translation_io_for_triton(
             input_texts, source_lang, target_lang
@@ -437,6 +460,12 @@ class InferenceService:
         results = []
         for source_text, result in zip(input_texts, output_batch):
             results.append({"source": source_text, "target": result[0].decode("utf-8")})
+
+        if profanityFilter == True:
+            results = [
+                {"source": each_result["source"], "target": profanityFilterObject.censor_words(source_lang,each_result["target"])}
+                for each_result in results
+            ]
 
         return ULCATranslationInferenceResponse(output=results)
     
@@ -624,10 +653,17 @@ class InferenceService:
             else request_body.config.audioFormat.value
         )
 
+        profanityFilter = True
+        if request_body.config.profanityFilter is not None and request_body.config.profanityFilter == False:
+            profanityFilter = False
+
         results = []
 
         for input in request_body.input:
             input_string = self.__process_tts_input(input.source)
+            
+            if profanityFilter == True:
+                input_string = profanityFilterObject.censor_words(ip_language,input_string)
 
             if input_string:
                 inputs, outputs = self.triton_utils_service.get_tts_io_for_triton(

@@ -15,6 +15,7 @@ class _ULCATtsInferenceRequestConfig(_ULCABaseInferenceRequestConfig):
     samplingRate: Optional[int] = None
     audioFormat: AudioFormat = AudioFormat.WAV
     language: _ULCALanguage
+    profanityFilter: bool = True
 
 
 class ULCATtsInferenceRequest(_ULCABaseInferenceRequest):

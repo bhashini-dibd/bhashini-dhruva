@@ -25,8 +25,9 @@ class ProfanityFilter():
         for token in indic_tokenize.trivial_tokenize(text,lang=language): 
             if token not in lang_code_sets[language]:
                 tokens.append(token)
-        print(f"AFTER CENSORING TEXT :: {text} and language :: {language}")
-        return " ".join(tokens)
+        resulting_string = " ".join(tokens)
+        print(f"AFTER CENSORING TEXT :: {resulting_string} and language :: {language}")
+        return resulting_string
 
     def censor_words(self, language, text):
         try:

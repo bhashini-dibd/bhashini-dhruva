@@ -425,7 +425,7 @@ class InferenceService:
         ]
 
         if profanityFilter == True:
-
+            print(f"BEFORE CENSORING TEXTS INPUT_TEXTS :: {input_texts}")
             input_texts = [
                 profanityFilterObject.censor_words(source_lang,input_text)
                 for input_text in input_texts

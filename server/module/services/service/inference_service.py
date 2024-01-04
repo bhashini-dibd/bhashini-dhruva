@@ -432,12 +432,12 @@ class InferenceService:
 
         # Default to three dashes if the input string is empty
         input_texts = [
-            input_text = "---"
-            if input_text.strip() == "":
-            else
-            input_text
-            for input_text in input_texts
-        ]
+                "---"
+                if input_text.strip() == ""
+                else
+                input_text
+                for input_text in input_texts
+            ]
             
         inputs, outputs = self.triton_utils_service.get_translation_io_for_triton(
             input_texts, source_lang, target_lang

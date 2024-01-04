@@ -425,12 +425,16 @@ class InferenceService:
         ]
 
         if profanityFilter == True:
-
             input_texts = [
                 profanityFilterObject.censor_words(source_lang,input_text)
                 for input_text in input_texts
             ]
 
+        # Default to three dashes if the input string is empty
+            
+        if input_texts.strip() == "":
+            input_texts = "---"
+            
         inputs, outputs = self.triton_utils_service.get_translation_io_for_triton(
             input_texts, source_lang, target_lang
         )

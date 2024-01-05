@@ -65,7 +65,7 @@ class StreamingServerTaskSequence:
 
         if "BACKEND_PORT" in os.environ:
             # self.inference_url = "https://bhashini-dhruva-staging-backend-app-service.azurewebsites.net/services/inference/pipeline"
-            self.inference_url = f"http://0.0.0.0:5050/services/inference/pipeline"
+            self.inference_url = f"http://127.0.0.1:5050/services/inference/pipeline"
         else:
             # self.inference_url = "https://api.dhruva.ai4bharat.org/services/inference/pipeline"
             exit(f"ERROR: Please set the env var `BACKEND_PORT`")

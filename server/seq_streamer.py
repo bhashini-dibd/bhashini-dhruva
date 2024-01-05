@@ -9,7 +9,7 @@ from urllib.parse import parse_qs
 import numpy as np
 import requests
 import socketio
-from module.services.service.audio_service import AudioService
+from module.services.service.streamer_service import AudioService
 from pydantic import BaseModel
 from schema.services.common import _ULCATaskType
 from scipy.io.wavfile import write as scipy_wav_write

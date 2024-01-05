@@ -9,7 +9,7 @@ from urllib.parse import parse_qs
 import numpy as np
 import requests
 import socketio
-from module.services.service.audio_service import AudioService
+from module.services.service.streamer_service import AudioService
 from pydantic import BaseModel
 from schema.services.common import _ULCATaskType
 from scipy.io.wavfile import write as scipy_wav_write
@@ -63,8 +63,10 @@ class StreamingServerTaskSequence:
                 # other_asgi_app=app
             )
 
-        if "BACKEND_PORT" in os.environ:
-            self.inference_url = f"http://localhost:{os.environ['BACKEND_PORT']}/services/inference/pipeline"
+        if "PIPELINE_URL" in os.environ:
+            self.inference_url = os.environ.get('PIPELINE_URL')
+            # "https://bhashini-dhruva-staging-backend-app-service.azurewebsites.net/services/inference/pipeline"
+            # self.inference_url = f"http://127.0.0.1:5050/services/inference/pipeline"
         else:
             # self.inference_url = "https://api.dhruva.ai4bharat.org/services/inference/pipeline"
             exit(f"ERROR: Please set the env var `BACKEND_PORT`")

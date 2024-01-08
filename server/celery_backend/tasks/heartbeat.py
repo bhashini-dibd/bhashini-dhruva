@@ -89,6 +89,9 @@ def inference_heartbeat():
 
     # transforming models structure for easier access
     for model in models:
+        print('****************')
+        print(model)
+        print('**************')
         model_dict[model["modelId"]] = model
 
     if fetch_list_success:
